@@ -24,12 +24,12 @@ import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.util.EntityUtils;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
+import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiValidationException;
 
@@ -53,11 +53,12 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
     private final String token;
     private volatile CloseableHttpClient httpclient;
     private volatile RequestConfig requestConfig;
-
+    private final String botName;
 
     public TelegramBot(String token, String name) {
-        super(name);
+        super();
         this.token = token;
+        this.botName = name;
 
         initializeProxy();
 
@@ -68,14 +69,13 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 new UnsubCommand(),
                 new StatusCommand()
         ).forEach(this::register);
+
     }
 
     public void sendMessage(Long chatId, String message) {
         final SendMessage sendMessageRequest = new SendMessage();
-
         sendMessageRequest.setChatId(chatId.toString());
         sendMessageRequest.setText(message);
-        sendMessageRequest.enableMarkdown(true);
 
         try {
             execute(sendMessageRequest);
@@ -260,5 +260,10 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
             BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(httpEntity);
             return EntityUtils.toString(bufferedHttpEntity, StandardCharsets.UTF_8);
         }
+    }
+
+    @Override
+    public String getBotUsername() {
+        return this.botName;
     }
 }

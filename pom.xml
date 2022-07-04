@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>3.57</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>telegram-notifications</artifactId>
@@ -20,7 +21,6 @@
     <properties>
 
         <!--Versions-->
-
         <java.level>8</java.level>
         <jenkins.version>2.7</jenkins.version>
 
@@ -30,8 +30,7 @@
         <jacoco.version>0.7.4.201502262128</jacoco.version>
 
         <!--Libraries-->
-        <slf4j.version>1.7.29</slf4j.version>
-        <telegrambots.version>4.6</telegrambots.version>
+        <telegrambots.version>6.1.0</telegrambots.version>
         <jenkins.plugins.job-dsl.version>1.68</jenkins.plugins.job-dsl.version>
         <jenkins.plugins.structs.version>1.13</jenkins.plugins.structs.version>
         <jenkins.plugins.token-macro.version>2.3</jenkins.plugins.token-macro.version>
@@ -45,7 +44,8 @@
 
     <scm>
         <connection>scm:git:https://github.com/jenkinsci/telegram-notifications-plugin.git</connection>
-        <developerConnection>scm:git:https://github.com/jenkinsci/telegram-notifications-plugin.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/jenkinsci/telegram-notifications-plugin.git
+        </developerConnection>
         <url>https://github.com/jenkinsci/telegram-notifications-plugin</url>
         <tag>HEAD</tag>
     </scm>
@@ -82,23 +82,19 @@
     </pluginRepositories>
 
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
         <!--Telegram Bot related dependencies-->
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
             <version>${telegrambots.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-meta</artifactId>
             <version>${telegrambots.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambotsextensions</artifactId>
@@ -112,17 +108,29 @@
             <version>${jenkins.plugins.job-dsl.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>token-macro</artifactId>
             <version>${jenkins.plugins.token-macro.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>structs</artifactId>
             <version>${jenkins.plugins.structs.version}</version>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.36</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

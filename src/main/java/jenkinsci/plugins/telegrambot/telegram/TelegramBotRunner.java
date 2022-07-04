@@ -1,11 +1,10 @@
 package jenkinsci.plugins.telegrambot.telegram;
 
-import jenkins.model.GlobalConfiguration;
-import jenkinsci.plugins.telegrambot.TelegramBotGlobalConfiguration;
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.meta.generics.BotSession;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +16,7 @@ public class TelegramBotRunner {
 
     private static final Logger LOG = Logger.getLogger(TelegramBot.class.getName());
 
-    private final TelegramBotsApi api = new TelegramBotsApi();
+    private TelegramBotsApi api;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private TelegramBot bot;
@@ -25,10 +24,14 @@ public class TelegramBotRunner {
 
     private String botToken;
     private String botName;
+    private Long chatId;
 
-
-    static {
-        ApiContextInitializer.init();
+    public TelegramBotRunner() {
+        try {
+            api = new TelegramBotsApi(DefaultBotSession.class);
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, e.getMessage());
+        }
     }
 
     public synchronized static TelegramBotRunner getInstance() {
@@ -41,6 +44,13 @@ public class TelegramBotRunner {
     public void runBot(String name, String token) {
         botName = name;
         botToken = token;
+        executor.submit(startBotTask);
+    }
+
+    public void runBot(String name, String token, Long chatId) {
+        botName = name;
+        botToken = token;
+        this.chatId = chatId;
         executor.submit(startBotTask);
     }
 
@@ -72,6 +82,12 @@ public class TelegramBotRunner {
             LOG.log(Level.INFO, "New bot session was registered");
         } catch (TelegramApiRequestException e) {
             LOG.log(Level.SEVERE, "Telegram API error", e);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
+    }
+
+    public Long getChatId() {
+        return chatId;
     }
 }

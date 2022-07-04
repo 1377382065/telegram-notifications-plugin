@@ -1,8 +1,5 @@
 package jenkinsci.plugins.telegrambot.users;
 
-import jenkins.model.GlobalConfiguration;
-import jenkinsci.plugins.telegrambot.TelegramBotGlobalConfiguration;
-
 import java.util.HashSet;
 import java.util.Observable;
 import java.util.Set;
@@ -32,10 +29,6 @@ public class Subscribers extends Observable {
     }
 
     public Set<User> getApprovedUsers() {
-        if (GlobalConfiguration.all().get(TelegramBotGlobalConfiguration.class).getApprovalType() == UserApprover.ApprovalType.ALL) {
-            return users.stream().collect(Collectors.toSet());
-        }
-
         return users.stream()
                 .filter(User::isApproved)
                 .collect(Collectors.toSet());

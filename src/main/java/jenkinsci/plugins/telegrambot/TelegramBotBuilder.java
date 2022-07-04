@@ -9,7 +9,6 @@ import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import jenkins.tasks.SimpleBuildStep;
-import jenkinsci.plugins.telegrambot.telegram.TelegramBotRunner;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.Nonnull;
@@ -50,10 +49,9 @@ public class TelegramBotBuilder extends Builder implements SimpleBuildStep {
             @Nonnull Run<?, ?> run,
             @Nonnull FilePath filePath,
             @Nonnull Launcher launcher,
-            @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
-
-        TelegramBotRunner.getInstance().getBot()
-                .sendMessage(getMessage(), run, filePath, taskListener);
+            @Nonnull TaskListener taskListener
+    ) throws InterruptedException, IOException {
+        Common.send(run, message);
     }
 
 }

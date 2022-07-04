@@ -1,24 +1,19 @@
 package jenkinsci.plugins.telegrambot;
 
 import hudson.Extension;
-import hudson.model.AbstractProject;
-import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
 import jenkinsci.plugins.telegrambot.telegram.TelegramBotRunner;
-import jenkinsci.plugins.telegrambot.users.Subscribers;
-import jenkinsci.plugins.telegrambot.users.User;
-import jenkinsci.plugins.telegrambot.users.UserApprover;
 import jenkinsci.plugins.telegrambot.utils.StaplerRequestContainer;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
-import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,13 +24,16 @@ import java.util.stream.Collectors;
 public class TelegramBotGlobalConfiguration extends GlobalConfiguration {
 
     final static String PLUGIN_DISPLAY_NAME = "TelegramBot";
+
     private final Map<String, String> botStrings;
 
     private Boolean shouldLogToConsole = Boolean.TRUE;
+
     private String botToken;
+
+    private Long chatId;
+
     private String botName;
-    private UserApprover.ApprovalType approvalType;
-    private Set<User> users;
 
     /**
      * Called when Jenkins is starting and it's config is loading
@@ -52,13 +50,8 @@ public class TelegramBotGlobalConfiguration extends GlobalConfiguration {
         }
         // Load global Jenkins config
         load();
-
-        // Save the loaded recipients map
-        Subscribers.getInstance().setUsers(users != null ? users : new HashSet<>());
-        Subscribers.getInstance().addObserver(this::onSubscribersUpdate);
-
         // Run the bot after Jenkins config has been loaded
-        TelegramBotRunner.getInstance().runBot(botName, botToken);
+        TelegramBotRunner.getInstance().runBot(botName, botToken, chatId);
     }
 
     /**
@@ -70,37 +63,14 @@ public class TelegramBotGlobalConfiguration extends GlobalConfiguration {
         // Save for the future using
         StaplerRequestContainer.req = req;
 
-        // Getting simple params from formData
-        setShouldLogToConsole(formData.getBoolean("shouldLogToConsole"));
         setBotToken(formData.getString("botToken"));
         setBotName(formData.getString("botName"));
+        setChatId(formData.getLong("chatId"));
 
-        // Approve users
-        UserApprover userApprover = new UserApprover(users != null ? users : new HashSet<>());
-        approvalType = userApprover.approve(formData);
-        users = userApprover.getUsers();
+        TelegramBotRunner.getInstance().runBot(botName, botToken, chatId);
 
-        // Store users
-        Subscribers.getInstance().setUsers(users != null ? new HashSet<>(users) : new HashSet<>());
-
-        TelegramBotRunner.getInstance().runBot(botName, botToken);
-
-        // Save the configuration
         save();
         return super.configure(req, formData);
-    }
-
-    private void onSubscribersUpdate(Observable o, Object arg) {
-        users = Subscribers.getInstance().getUsers();
-        save();
-    }
-
-    public FormValidation doCheckMessage(@QueryParameter String value) throws IOException, ServletException {
-        return value.length() == 0 ? FormValidation.error("Please set a message") : FormValidation.ok();
-    }
-
-    public boolean isApplicable(Class<? extends AbstractProject> clazz) {
-        return true;
     }
 
     @Nonnull
@@ -137,16 +107,12 @@ public class TelegramBotGlobalConfiguration extends GlobalConfiguration {
         this.botName = botName;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
-    public UserApprover.ApprovalType getApprovalType() {
-        return approvalType;
-    }
-
-    public void setApprovalType(UserApprover.ApprovalType approvalType) {
-        this.approvalType = approvalType;
+    public Long getChatId() {
+        return chatId;
     }
 
 }
