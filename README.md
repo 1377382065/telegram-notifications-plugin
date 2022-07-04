@@ -8,6 +8,9 @@ This plugin allows **Jenkins** to send notifications via **telegram** bot.
  
 ## Installation
 
+## support send to telegram chat group
+![img_1.png](img_1.png)
+
 ### Build from source 
 1. To build a plugin, run `mvn install`. This will create the file *./target/telegram-notifications.hpi*
 2. [Manually install](https://jenkins.io/doc/book/managing/plugins/#advanced-installation) plugin to your Jenkins
